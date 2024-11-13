@@ -35,8 +35,8 @@ resource "google_container_node_pool" "general" {
   }
 
   management {
-    auto_repair  = true  #default true
-    auto_upgrade = false #default true
+    auto_repair  = true
+    auto_upgrade = true
   }
 
   node_config {

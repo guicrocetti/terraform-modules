@@ -44,3 +44,5 @@ variable "machine_type" {
 variable "node_label" {
   default = "terraform-node-pool"
 }
+
+# Auto_upgrade must be true when release_channel REGULAR is set.
