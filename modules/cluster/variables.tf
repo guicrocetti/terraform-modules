@@ -21,14 +21,13 @@ variable "cluster_name" {
   sensitive = false
 }
 
+variable "service_account_email" {
+  type = string
+}
 # ---------------------------------------------------------------------------------------------------------------------
 # OPTIONAL VARIABLES
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "service_account" {
-  type    = string
-  default = "terraform-default-sa"
-}
 
 variable "node_count" {
   type        = number

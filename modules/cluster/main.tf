@@ -19,11 +19,11 @@ resource "google_container_cluster" "primary" {
   }
 }
 
-
+# REMOVED THE CREATION OF A NEW SERVICE ACCOUNT HERE, AND NOW IT WILL HAVE TO BE CREATE SEPARATED ON TERRAGRUNT 
 # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/google_service_account
-resource "google_service_account" "argocd-k8s" {
-  account_id = var.service_account
-}
+# resource "google_service_account" "cluster" {
+#   account_id = var.service_account
+# }
 
 # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_node_pool
 resource "google_container_node_pool" "general" {
@@ -46,7 +46,7 @@ resource "google_container_node_pool" "general" {
       role = var.node_label
     }
 
-    service_account = google_service_account.argocd-k8s.email
+    service_account = var.service_account_email
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
