@@ -4,7 +4,7 @@ data "google_dns_managed_zone" "env_dns_zone" {
 }
 
 resource "google_dns_record_set" "name" {
-  name         = "${var.sub_domain}.${var.dns_name}."
+  name         = "${var.sub_domain}.${var.dns_name}"
   type         = "A"
   ttl          = var.ttl
   managed_zone = data.google_dns_managed_zone.env_dns_zone.name
