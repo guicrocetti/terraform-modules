@@ -18,7 +18,7 @@ variable "cluster_ca_certificate" {
   type        = string
 }
 
-variable "argo_domain" {
-  description = "ArgoCD domain name"
-  type        = string
-}
+# variable "argo_domain" {
+#   description = "ArgoCD domain name"
+#   type        = string
+# }
