@@ -1,3 +1,27 @@
+# ---------------------------------------------------------------------------------------------------------------------
+# PROVIDER CONFIGURATION
+# ---------------------------------------------------------------------------------------------------------------------
+
+terraform {
+  required_version = ">= 1.1"
+
+  required_providers {
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = ">= 2.31.0"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = ">= 2.14.0"
+    }
+    kubectl = {
+      source  = "alekc/kubectl"
+      version = "~> 2.0.4"
+    }
+  }
+}
+
+
 provider "kubernetes" {
   host  = "https://${var.cluster_endpoint}"
   token = data.google_client_config.provider.access_token
@@ -36,6 +60,10 @@ provider "kubectl" {
   }
 }
 
+
+# ---------------------------------------------------------------------------------------------------------------------
+# DEPLOY ARGOCD
+# ---------------------------------------------------------------------------------------------------------------------
 
 
 resource "kubectl_manifest" "argocd_namespace" {
