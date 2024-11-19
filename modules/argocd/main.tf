@@ -21,6 +21,7 @@ terraform {
   }
 }
 
+data "google_client_config" "provider" {}
 
 provider "kubernetes" {
   host  = "https://${var.cluster_endpoint}"
