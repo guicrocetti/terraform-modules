@@ -1,9 +1,18 @@
+locals {
+  network    = coalesce(var.network_self_link, "projects/${var.project_id}/global/networks/default")
+  subnetwork = coalesce(var.subnetwork_self_link, "projects/${var.project_id}/regions/${var.region}/subnetworks/default")
+}
+
+
 # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/container_cluster
 resource "google_container_cluster" "primary" {
   name                     = var.cluster_name
   location                 = var.zone
-  remove_default_node_pool = true
-  initial_node_count       = 1
+  remove_default_node_pool = var.remove_default_node_pool
+  initial_node_count       = var.initial_node_count
+  network                  = local.network
+  subnetwork               = local.subnetwork
+  deletion_protection      = var.deletion_protection
 
   release_channel {
     channel = "REGULAR"
