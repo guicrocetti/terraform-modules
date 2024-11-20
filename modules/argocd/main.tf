@@ -140,6 +140,11 @@ resource "helm_release" "argocd" {
   ]
 
   dependency_update = true
+  lifecycle {
+    ignore_changes = all
+  }
+
+  atomic = true
 
   # depends_on = [
   #   kubectl_manifest.argocd_namespace,
