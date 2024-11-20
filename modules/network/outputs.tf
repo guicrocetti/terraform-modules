@@ -3,6 +3,11 @@ output "network_self_link" {
   value       = google_compute_network.terraform-network.self_link
 }
 
+output "subnetwork_self_link" {
+  description = "subnetwork self link"
+  value       = google_compute_subnetwork.private.self_link
+}
+
 output "network_name" {
   description = "VPC Name"
   value       = google_compute_network.terraform-network.name
