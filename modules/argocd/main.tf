@@ -26,8 +26,9 @@ data "google_client_config" "provider" {}
 provider "kubernetes" {
   host  = "https://${var.cluster_endpoint}"
   token = data.google_client_config.provider.access_token
-  cluster_ca_certificate = base64decode(
-    var.cluster_ca_certificate,
+  cluster_ca_certificate = try(
+    base64decode(var.cluster_ca_certificate),
+    null
   )
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
@@ -38,8 +39,9 @@ provider "kubernetes" {
 provider "helm" {
   kubernetes {
     host = "https://${var.cluster_endpoint}"
-    cluster_ca_certificate = base64decode(
-      var.cluster_ca_certificate,
+    cluster_ca_certificate = try(
+      base64decode(var.cluster_ca_certificate),
+      null
     )
     token = data.google_client_config.provider.access_token
     exec {
@@ -51,8 +53,9 @@ provider "helm" {
 
 provider "kubectl" {
   host = "https://${var.cluster_endpoint}"
-  cluster_ca_certificate = base64decode(
-    var.cluster_ca_certificate,
+  cluster_ca_certificate = try(
+    base64decode(var.cluster_ca_certificate),
+    null
   )
   token = data.google_client_config.provider.access_token
   exec {
