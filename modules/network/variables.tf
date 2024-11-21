@@ -36,5 +36,5 @@ variable "k8s_service_range" {
 variable "create_vpc" {
   description = "true or false to create or not the vpc"
   type        = bool
-  default     = false
+  default     = true
 }
