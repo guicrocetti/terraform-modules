@@ -18,13 +18,13 @@ resource "google_project_service" "container" {
 # ---------------------------------------------------------------------------------------------------------------------
 
 data "google_compute_network" "default" {
-  count   = try(var.network_name, "") != "" ? 1 : 0
+  count   = !var.create_vpc ? 1 : 0
   name    = var.network_name
   project = var.project_id
 }
 
 data "google_compute_subnetwork" "default" {
-  count  = try(var.subnetwork_name, "") != "" ? 1 : 0
+  count  = !var.create_vpc ? 1 : 0
   name   = var.subnetwork_name
   region = var.region
 }
@@ -35,23 +35,19 @@ data "google_compute_subnetwork" "default" {
 
 # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network
 resource "google_compute_network" "private" {
-  count                           = length(data.google_compute_network.default) == 0 ? 1 : 0
+  count                           = var.create_vpc ? 1 : 0
   name                            = var.network_name
   routing_mode                    = "REGIONAL"
   auto_create_subnetworks         = false
   mtu                             = 1460
   delete_default_routes_on_create = false
 
-  depends_on = [
-    google_project_service.compute,
-    google_project_service.container
-  ]
 }
 
 
 # https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_subnetwork
 resource "google_compute_subnetwork" "private" {
-  count                    = length(data.google_compute_subnetwork.default) == 0 ? 1 : 0
+  count                    = var.create_vpc ? 1 : 0
   name                     = var.subnetwork_name
   ip_cidr_range            = var.cidr_range
   region                   = var.region
@@ -68,6 +64,6 @@ resource "google_compute_subnetwork" "private" {
   }
 
   lifecycle {
-    ignore_changes = [secondary_ip_range]
+    ignore_changes = [google_compute_subnetwork.private[0].secondary_ip_range]
   }
 }

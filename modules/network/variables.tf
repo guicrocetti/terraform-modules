@@ -32,3 +32,9 @@ variable "k8s_service_range" {
   description = "k8s service range"
   default     = "10.52.0.0/20" //4096 IPs - 10.52.0.0 to 10.52.15.255.
 }
+
+variable "create_vpc" {
+  description = "true or false to create or not the vpc"
+  type        = bool
+  default     = false
+}
