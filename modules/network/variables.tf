@@ -1,5 +1,11 @@
+variable "project_id" {
+  description = "project id name"
+  type        = string
+}
+
 variable "region" {
   description = "region for the network"
+  type        = string
 }
 
 variable "network_name" {
