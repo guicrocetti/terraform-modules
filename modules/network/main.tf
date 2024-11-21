@@ -64,6 +64,6 @@ resource "google_compute_subnetwork" "private" {
   }
 
   lifecycle {
-    ignore_changes = [google_compute_subnetwork.private[0].secondary_ip_range]
+    ignore_changes = [secondary_ip_range]
   }
 }
