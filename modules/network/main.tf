@@ -64,4 +64,8 @@ resource "google_compute_subnetwork" "private" {
     range_name    = "k8s-service-range"
     ip_cidr_range = var.k8s_service_range
   }
+
+  lifecycle {
+    ignore_changes = [secondary_ip_range]
+  }
 }
