@@ -24,10 +24,10 @@ output "network_cidr_ranges" {
     data.google_compute_subnetwork.default[0].ip_cidr_range :
     google_compute_subnetwork.private[0].ip_cidr_range,
 
-    try(data.google_compute_subnetwork.default[0].secondary_ip_range[0].ip_cidr_range,
-    google_compute_subnetwork.private[0].secondary_ip_range[0].ip_cidr_range),
+    !var.create_vpc ? try(data.google_compute_subnetwork.default[0].secondary_ip_range[0].ip_cidr_range, "") :
+    try(google_compute_subnetwork.private[0].secondary_ip_range[0].ip_cidr_range, ""),
 
-    try(data.google_compute_subnetwork.default[0].secondary_ip_range[1].ip_cidr_range,
-    google_compute_subnetwork.private[0].secondary_ip_range[1].ip_cidr_range)
+    !var.create_vpc ? try(data.google_compute_subnetwork.default[0].secondary_ip_range[1].ip_cidr_range,
+    "") : try(google_compute_subnetwork.private[0].secondary_ip_range[1].ip_cidr_range, "")
   ])
 }
