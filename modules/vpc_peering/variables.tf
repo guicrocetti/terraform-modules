@@ -4,21 +4,21 @@ variable "project_id" {
 }
 
 variable "peer_network_self_link1" {
-  description = "Self link of the first network to peer."
+  description = "output of module network -> network_self_link"
   type        = string
 }
 
 variable "peer_network_self_link2" {
-  description = "Self link of the second network to peer."
+  description = "output of module network -> network_self_link"
   type        = string
 }
 
 variable "peer_network_name_1" {
-  description = "network 1 name"
+  description = "output of module network -> network_name"
   type        = string
 }
 
 variable "peer_network_name_2" {
-  description = "network 2 name"
+  description = "output of module network -> network_name"
   type        = string
 }
