@@ -7,12 +7,12 @@ variable "project_id" {
   type        = string
 }
 
-variable "service_account_email" {
-  description = "service account email"
+variable "service_account_name" {
+  description = "service account name"
   type        = string
 }
 
 variable "roles" {
-  description = "['roles/iam.workloadIdentityUser',]"
   type        = list(string)
+  description = "List of roles to assign to the service account"
 }
