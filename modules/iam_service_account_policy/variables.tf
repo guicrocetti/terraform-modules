@@ -13,6 +13,6 @@ variable "service_account_name" {
 }
 
 variable "roles" {
-  description = "['roles/iam.workloadIdentityUser',]"
   type        = list(string)
+  description = "List of roles to assign to the service account"
 }
