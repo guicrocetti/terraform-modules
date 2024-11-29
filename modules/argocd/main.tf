@@ -109,6 +109,13 @@ resource "null_resource" "git_clone_and_apply" {
 
   provisioner "local-exec" {
     command = <<-EOT
+      # Configure kubectl
+      echo "${base64decode(var.cluster_ca_certificate)}" > /tmp/ca.crt
+      kubectl config set-cluster gke-cluster --server=https://${var.cluster_endpoint} --certificate-authority=/tmp/ca.crt
+      kubectl config set-credentials gke-user --token=${data.google_client_config.provider.access_token}
+      kubectl config set-context gke-context --cluster=gke-cluster --user=gke-user
+      kubectl config use-context gke-context
+
       # Clone the private repository using the provided token
       git clone https://${var.argocd_repo_token}@github.com/${var.repository_name}.git /tmp/argocd-config
       
@@ -120,6 +127,7 @@ resource "null_resource" "git_clone_and_apply" {
       
       # Cleanup
       rm -rf /tmp/argocd-config
+      rm -f /tmp/ca.crt
     EOT
   }
 }
