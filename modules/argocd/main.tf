@@ -64,112 +64,62 @@ provider "kubectl" {
   }
 }
 
-
 # ---------------------------------------------------------------------------------------------------------------------
 # DEPLOY ARGOCD
 # ---------------------------------------------------------------------------------------------------------------------
 
-
-resource "kubectl_manifest" "argocd_namespace" {
-  yaml_body  = <<YAML
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: argocd
-YAML
-  apply_only = true
-}
-
 resource "helm_release" "argocd" {
-  chart      = "argo-cd"
-  name       = "argocd"
-  namespace  = "argocd"
-  repository = "https://argoproj.github.io/argo-helm"
-  version    = "v7.7.3"
-
-  values = [
-    yamlencode({
-      # domain = "${var.argo_domain}"
-
-      certificate = {
-        enabled = false
-      }
-
-      "argo-cd" = {
-        "redis-ha" = {
-          enabled = true
-        }
-
-        controller = {
-          replicas = 1
-        }
-
-        # server = {
-        #   extraArgs = ["--insecure"]
-        #   replicas  = 2
-        #   ingress = {
-        #     enabled          = true
-        #     ingressClassName = "nginx"
-        #     annotations = {
-        #       "nginx.ingress.kubernetes.io/force-ssl-redirect" = "true"
-        #       "nginx.ingress.kubernetes.io/ssl-passthrough"    = "true"
-        #     }
-        #     tls = true
-        #     config = {
-        #       tls = {
-        #         secretName = "argocd-server-tls"
-        #       }
-        #     }
-        #   }
-        # }
-
-        repoServer = {
-          replicas = 2
-        }
-
-        applicationSet = {
-          replicas = 2
-        }
-
-        dex = {
-          enabled = true
-        }
-
-        notifications = {
-          enabled = true
-        }
-      }
-    })
-  ]
+  chart            = "argo-cd"
+  name             = "argocd"
+  namespace        = "argocd"
+  repository       = "https://argoproj.github.io/argo-helm"
+  version          = "v7.7.3"
+  create_namespace = true
 
   dependency_update = true
+
   lifecycle {
     ignore_changes = all
   }
 
   atomic = false
-
-  # depends_on = [
-  #   kubectl_manifest.argocd_namespace,
-  #   google_container_node_pool.general,
-  #   helm_release.external_secrets,
-  #   helm_release.ingress-nginx
-  # ]
 }
 
-# resource "kubectl_manifest" "AppProject" {
-#   yaml_body = templatefile("${path.module}/argocd/application.yaml", {
-#     repo_username = var.git_repository_username
-#     repo_name     = var.git_repository
-#     cluster_name  = var.cluster_name
-#   })
+resource "kubernetes_secret" "argocd_repo_secret" {
+  depends_on = [helm_release.argocd]
 
-#   depends_on = [helm_release.argocd]
+  metadata {
+    name      = "private-repo"
+    namespace = "argocd"
+    labels = {
+      "argocd.argoproj.io/secret-type" = "repository"
+    }
+  }
 
-#   wait_for {
-#     field {
-#       key   = "status.sync.status"
-#       value = "Synced"
-#     }
-#   }
-# }
+  data = {
+    type     = "git"
+    url      = "https://github.com/${var.repository_name}.git"
+    username = var.repo_username
+    password = var.argocd_repo_token
+  }
+}
+
+resource "null_resource" "git_clone_and_apply" {
+  depends_on = [helm_release.argocd, kubernetes_secret.argocd_repo_secret]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      # Clone the private repository using the provided token
+      git clone https://${var.argocd_repo_token}@github.com/${var.repository_name}.git /tmp/argocd-config
+      
+      # Wait for ArgoCD to be ready
+      kubectl wait --for=condition=available --timeout=300s deployment/argocd-server -n argocd
+      
+      # Apply the kustomization
+      kubectl apply -k /tmp/argocd-config/argocd
+      
+      # Cleanup
+      rm -rf /tmp/argocd-config
+    EOT
+  }
+}
